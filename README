@@ -1,0 +1,50 @@
+Catalyst::Model::DBI(3)User Contributed Perl DocumentatioCnatalyst::Model::DBI(3)
+
+
+
+NNAAMMEE
+       Catalyst::Model::DBI - DBI Model Class
+
+SSYYNNOOPPSSIISS
+               # use the helper
+               create model DBI DBI dsn user password
+
+               # lib/MyApp/Model/DBI.pm
+               package MyApp::Model::DBI;
+
+               use base 'Catalyst::Model::DBI';
+
+               __PACKAGE__->config(
+                       dsn           => 'dbi:Pg:dbname=myapp',
+                       password      => '',
+                       user          => 'postgres',
+                       options       => { AutoCommit => 1 },
+               );
+
+               1;
+
+               my $dbh = $c->model('DBI')->dbh;
+               #do something with $dbh ...
+
+DDEESSCCRRIIPPTTIIOONN
+       This is the "DBI" model class.
+
+MMEETTHHOODDSS
+       new Initializes DBI connection
+
+       $self->dbh
+           Returns the current database handle.
+
+SSEEEE AALLSSOO
+       Catalyst, DBI
+
+AAUUTTHHOORR
+       Alex Pavlovic, "alex.pavlovic@taskforce-1.com"
+
+CCOOPPYYRRIIGGHHTT
+       This program is free software, you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.7                       2005-11-27           Catalyst::Model::DBI(3)
