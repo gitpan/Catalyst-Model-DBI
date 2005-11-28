@@ -3,6 +3,8 @@ package Catalyst::Helper::Model::DBI;
 use strict;
 use File::Spec;
 
+our $VERSION = '0.11';
+
 =head1 NAME
 
 Catalyst::Helper::Model::DBI - Helper for DBI Models
@@ -83,7 +85,7 @@ See L<[% app %]>
 
 =head1 DESCRIPTION
 
-DBIC Model Class.
+DBI Model Class.
 
 =head1 AUTHOR
 

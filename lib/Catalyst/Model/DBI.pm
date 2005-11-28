@@ -5,7 +5,7 @@ use base 'Catalyst::Base';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 __PACKAGE__->mk_accessors('dbh');
 
