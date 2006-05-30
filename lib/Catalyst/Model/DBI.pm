@@ -5,9 +5,9 @@ use base 'Catalyst::Base';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
-__PACKAGE__->mk_accessors('dbh');
+__PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
 =head1 NAME
 
@@ -50,23 +50,69 @@ Initializes DBI connection
 =cut
 
 sub new {
-    my ( $self, $c ) = @_;
-    $self = $self->NEXT::new($c);
-    $self->{namespace}               ||= ref $self;
-    $self->{additional_base_classes} ||= ();
+	my ( $self, $c ) = @_;
+	$self = $self->NEXT::new($c);
+	$self->{namespace}               ||= ref $self;
+	$self->{additional_base_classes} ||= ();
+	$self->{log} = $c->log;
+	$self->{debug} = $c->debug;
+	return $self;
+}
+
+sub dbh {
+	return shift->stay_connected;
+}
+
+sub stay_connected {
+	my $self = shift;
+	if ( $self->_dbh ) {
+		if ( defined $self->_tid && $self->_tid != threads->tid ) {
+			$self->_dbh(undef);
+      		} elsif ( $self->_pid != $$ ) {
+			$self->_dbh->{InactiveDestroy} = 1;
+			$self->_dbh ( undef );
+			$self->_dbh ( $self->connect );
+		}
+	} else {
+		$self->_dbh ( $self->connect );
+	}
+	return $self->_dbh;
+}
+
+sub connected {
+	my $self = shift;
+	return $self->_dbh->{Active} && $self->_dbh->ping;
+}
+
+sub connect {
+	my $self = shift;
+	my $dbh;
 	eval { 
-		$self->dbh( 
-			DBI->connect( 
-				$self->{dsn}, 
-				$self->{user}, 
-				$self->{password},
-				$self->{options}
-			)
+		$dbh = DBI->connect( 
+			$self->{dsn}, 
+			$self->{user}, 
+			$self->{password},
+			$self->{options}
 		);
 	};
-    if ($@) { $c->log->debug( qq{Couldn't connect to the database "$@"} ) if $c->debug }
-    else { $c->log->debug ( q{Connected to the database} ) if $c->debug; }
-    return $self;
+	if ($@) { $self->{log}->debug( qq{Couldn't connect to the database "$@"} ) if $self->{debug} }
+	else { $self->{log}->debug ( q{Connected to the database} ) if $self->{debug}; }
+	$self->_pid ( $$ );
+	$self->_tid ( threads->tid ) if $INC{'threads.pm'};
+	return $dbh;
+}
+
+sub disconnect {
+	my $self = shift;
+	if( $self->connected ) {
+		$self->_dbh->rollback unless $self->_dbh->{AutoCommit};
+		$self->_dbh->disconnect;
+		$self->_dbh(undef);
+	}
+}
+
+sub DESTROY { 
+	shift->disconnect;
 }
 
 =item $self->dbh
