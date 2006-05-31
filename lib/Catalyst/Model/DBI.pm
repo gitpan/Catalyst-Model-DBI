@@ -1,11 +1,11 @@
 package Catalyst::Model::DBI;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Model';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
