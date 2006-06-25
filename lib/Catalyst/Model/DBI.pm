@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -67,10 +67,11 @@ sub stay_connected {
 	my $self = shift;
 	if ( $self->_dbh ) {
 		if ( defined $self->_tid && $self->_tid != threads->tid ) {
-			$self->_dbh(undef);
+			$self->_dbh ( $self->connect );
       		} elsif ( $self->_pid != $$ ) {
 			$self->_dbh->{InactiveDestroy} = 1;
-			$self->_dbh ( undef );
+			$self->_dbh ( $self->connect );
+		} elsif ( ! $self->connected ) {
 			$self->_dbh ( $self->connect );
 		}
 	} else {
@@ -96,7 +97,7 @@ sub connect {
 		);
 	};
 	if ($@) { $self->{log}->debug( qq{Couldn't connect to the database "$@"} ) if $self->{debug} }
-	else { $self->{log}->debug ( q{Connected to the database} ) if $self->{debug}; }
+	else { $self->{log}->debug ( 'Connected to the database via dsn:' . $self->{dsn} ) if $self->{debug}; }
 	$self->_pid ( $$ );
 	$self->_tid ( threads->tid ) if $INC{'threads.pm'};
 	return $dbh;
