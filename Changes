@@ -1,5 +1,6 @@
 Revision history for Perl extension Catalyst::Model::DBI.
-
+0.15  Sun Dec 10 23:00:00 2006
+        - added fix to support config
 0.14  Sat Jun 24 18:00:00 2006
 	- added additional check for stay_connected
 0.13  Tue May 30 22:00:00 2006

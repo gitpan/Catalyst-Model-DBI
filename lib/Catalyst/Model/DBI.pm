@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -50,8 +50,9 @@ Initializes DBI connection
 =cut
 
 sub new {
-	my ( $self, $c ) = @_;
-	$self = $self->NEXT::new($c);
+	my $self = shift;
+	my ($c) = @_;
+	$self = $self->NEXT::new(@_);
 	$self->{namespace}               ||= ref $self;
 	$self->{additional_base_classes} ||= ();
 	$self->{log} = $c->log;
