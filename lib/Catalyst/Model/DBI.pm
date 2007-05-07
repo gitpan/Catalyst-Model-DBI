@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -57,6 +57,7 @@ sub new {
 	$self->{additional_base_classes} ||= ();
 	$self->{log} = $c->log;
 	$self->{debug} = $c->debug;
+	$self->_pid ( $$ );
 	my $dbh;
 	$self->{__dbh} = \$dbh;
 	return $self;
@@ -68,17 +69,18 @@ sub dbh {
 
 sub stay_connected {
 	my $self = shift;
+	$self->_dbh( ${$self->{__dbh}} );
 	if ( $self->_dbh ) {
-		if ( defined $self->_tid && $self->_tid != threads->tid ) {
-			$self->_dbh ( $self->connect );
+		if (  $self->_tid && threads->tid && $self->_tid != threads->tid  ) {
+			$self->_dbh( $self->connect );
       		} elsif ( $self->_pid != $$ ) {
 			$self->_dbh->{InactiveDestroy} = 1;
-			$self->_dbh ( $self->connect );
+			$self->_dbh( $self->connect );
 		} elsif ( ! $self->connected ) {
-			$self->_dbh ( $self->connect );
+			$self->_dbh( $self->connect );
 		}
 	} else {
-		$self->_dbh ( $self->connect );
+		$self->_dbh( $self->connect );
 	}
 	${$self->{__dbh}} = $self->_dbh;
 	return $self->_dbh;
@@ -103,6 +105,7 @@ sub connect {
 	if ($@) { $self->{log}->debug( qq{Couldn't connect to the database "$@"} ) if $self->{debug} }
 	else { $self->{log}->debug ( 'Connected to the database via dsn:' . $self->{dsn} ) if $self->{debug}; }
 	$self->_pid ( $$ );
+	$self->{__pid} = $$;
 	$self->_tid ( threads->tid ) if $INC{'threads.pm'};
 	return $dbh;
 }

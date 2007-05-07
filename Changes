@@ -1,4 +1,6 @@
 Revision history for Perl extension Catalyst::Model::DBI.
+0.17  Mon May 07 08:00:00 2007
+	- made $self->_pid($$) "non lazy", fixed a few things
 0.16  Sun May 06 14:48:00 2007
 	- added fix to support ACCEPT_CONTEXT as per issue brought up by Evan Caroll
 0.15  Sun Dec 10 23:00:00 2006
