@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Catalyst-Model-DBI
-version:             0.18
+version:             0.19
 abstract:            ~
 license:             ~
 generated_by:        ExtUtils::MakeMaker version 6.32

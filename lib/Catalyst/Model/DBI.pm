@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -51,8 +51,8 @@ Initializes DBI connection
 
 sub new {
 	my $self = shift;
-	my ($c) = @_;
-	$self = $self->NEXT::new(@_);
+	my ( $c ) = @_;
+	$self = $self->NEXT::new( @_ );
 	$self->{namespace}               ||= ref $self;
 	$self->{additional_base_classes} ||= ();
 	$self->{log} = $c->log;
@@ -60,66 +60,93 @@ sub new {
 	return $self;
 }
 
+=item $self->dbh
+
+Returns the current database handle.
+
+=cut
+
 sub dbh {
 	return shift->stay_connected;
 }
+
+=item $self->stay_connected
+
+Returns a connected database handle.
+
+=cut
 
 sub stay_connected {
 	my $self = shift;
 	if ( $self->_dbh ) {
 		if ( defined $self->_tid && $self->_tid != threads->tid ) {
-			$self->_dbh ( $self->connect );
+			$self->_dbh( $self->connect );
       		} elsif ( $self->_pid != $$ ) {
 			$self->_dbh->{InactiveDestroy} = 1;
-			$self->_dbh ( $self->connect );
+			$self->_dbh( $self->connect );
 		} elsif ( ! $self->connected ) {
-			$self->_dbh ( $self->connect );
+			$self->_dbh( $self->connect );
 		}
 	} else {
-		$self->_dbh ( $self->connect );
+		$self->_dbh( $self->connect );
 	}
 	return $self->_dbh;
 }
+
+=item $self->connected
+
+Returns true if the database handle is active and pingable.
+
+=cut
 
 sub connected {
 	my $self = shift;
 	return $self->_dbh->{Active} && $self->_dbh->ping;
 }
 
+=item $self->connect
+
+Connects to the database and returns the handle.
+
+=cut
+
 sub connect {
 	my $self = shift;
 	my $dbh;
-	eval { 
-		$dbh = DBI->connect( 
-			$self->{dsn}, 
-			$self->{user}, 
+	eval {
+		$dbh = DBI->connect(
+			$self->{dsn},
+			$self->{user},
 			$self->{password},
 			$self->{options}
 		);
 	};
 	if ($@) { $self->{log}->debug( qq{Couldn't connect to the database "$@"} ) if $self->{debug} }
 	else { $self->{log}->debug ( 'Connected to the database via dsn:' . $self->{dsn} ) if $self->{debug}; }
-	$self->_pid ( $$ );
-	$self->_tid ( threads->tid ) if $INC{'threads.pm'};
+	$self->_pid( $$ );
+	$self->_tid( threads->tid ) if $INC{'threads.pm'};
 	return $dbh;
 }
+
+=item $self->disconnect
+
+Executes rollback if AutoCommit is active,
+disconnects and unsets the database handle.
+
+=cut
 
 sub disconnect {
 	my $self = shift;
 	if( $self->connected ) {
 		$self->_dbh->rollback unless $self->_dbh->{AutoCommit};
 		$self->_dbh->disconnect;
-		$self->_dbh(undef);
+		$self->_dbh( undef );
 	}
 }
 
-sub DESTROY { 
+sub DESTROY {
 	shift->disconnect;
 }
-
-=item $self->dbh
-
-Returns the current database handle.
 
 =back
 
@@ -133,7 +160,7 @@ Alex Pavlovic, C<alex.pavlovic@taskforce-1.com>
 
 =head1 COPYRIGHT
 
-This program is free software, you can redistribute it and/or modify it 
+This program is free software, you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
