@@ -1,6 +1,9 @@
 Revision history for Perl extension Catalyst::Model::DBI.
-0.19  Sun May 13 13:30:00 2007
-	- applied documentation patch sent by Simon Bertrang
+0.20  Sun Dec 07 17:36:00 2008 
+	- fixed issue: http://rt.cpan.org/Public/Bug/Display.html?id=38121
+	- fixed issue: http://rt.cpan.org/Public/Bug/Display.html?id=39884
+0.19  Fri Sep 07 18:00:00 2007
+	- cleaned up a few things
 0.18  Mon May 07 18:40:00 2007
         - reverting back to 0.15 as per Evan Caroll request, model behaving as expected 
 0.17  Mon May 07 08:00:00 2007

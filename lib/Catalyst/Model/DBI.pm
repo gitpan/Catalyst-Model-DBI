@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -101,6 +101,7 @@ Returns true if the database handle is active and pingable.
 
 sub connected {
 	my $self = shift;
+	return unless $self->_dbh;
 	return $self->_dbh->{Active} && $self->_dbh->ping;
 }
 
@@ -145,7 +146,8 @@ sub disconnect {
 }
 
 sub DESTROY {
-	shift->disconnect;
+	my $self = shift;
+	$self->disconnect if (defined $self->_dbh);
 }
 
 =back
