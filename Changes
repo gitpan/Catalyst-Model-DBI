@@ -1,4 +1,6 @@
 Revision history for Perl extension Catalyst::Model::DBI.
+0.22  Fri Oct 02 10:00:00 2008
+	- Change from NEXT to MRO::Compat
 0.21  Fri Oct 02 10:00:00 2008
         - Added support for configs named either "user" or "username" and "password" or "pass"
         - Updated the helper to use parent instead of base

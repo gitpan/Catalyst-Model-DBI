@@ -2,10 +2,10 @@ package Catalyst::Model::DBI;
 
 use strict;
 use base 'Catalyst::Model';
-use NEXT;
+use MRO::Compat;
 use DBI;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
