@@ -3,7 +3,7 @@ package Catalyst::Helper::Model::DBI;
 use strict;
 use File::Spec;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 NAME
 
@@ -66,7 +66,8 @@ __dbiclass__
 package [% class %];
 
 use strict;
-use base 'Catalyst::Model::DBI';
+use warnings;
+use parent 'Catalyst::Model::DBI';
 
 __PACKAGE__->config(
     dsn           => '[% dsn %]',

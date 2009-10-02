@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use NEXT;
 use DBI;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -16,7 +16,7 @@ Catalyst::Model::DBI - DBI Model Class
 =head1 SYNOPSIS
 
 	# use the helper
-	create model DBI DBI dsn user password
+	create model DBI DBI dsn username password
 	
 	# lib/MyApp/Model/DBI.pm
 	package MyApp::Model::DBI;
@@ -26,7 +26,7 @@ Catalyst::Model::DBI - DBI Model Class
 	__PACKAGE__->config(
 		dsn           => 'dbi:Pg:dbname=myapp',
 		password      => '',
-		user          => 'postgres',
+		username      => 'postgres',
 		options       => { AutoCommit => 1 },
 	);
 	
@@ -117,8 +117,8 @@ sub connect {
 	eval {
 		$dbh = DBI->connect(
 			$self->{dsn},
-			$self->{user},
-			$self->{password},
+			$self->{username} || $self->{user},
+			$self->{password} || $self->{pass},
 			$self->{options}
 		);
 	};
