@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use MRO::Compat;
 use DBI;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
