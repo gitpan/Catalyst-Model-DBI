@@ -5,7 +5,7 @@ use base 'Catalyst::Model';
 use MRO::Compat;
 use DBI;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -161,6 +161,12 @@ L<Catalyst>, L<DBI>
 Alex Pavlovic, C<alex.pavlovic@taskforce-1.com>
 
 =head1 COPYRIGHT
+
+Copyright (c) 2005 - 2009
+the Catalyst::Model::DBI L</AUTHOR>
+as listed above.
+
+=head1 LICENSE
 
 This program is free software, you can redistribute it and/or modify it
 under the same terms as Perl itself.
