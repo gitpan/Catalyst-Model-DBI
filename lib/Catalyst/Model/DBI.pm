@@ -2,10 +2,10 @@ package Catalyst::Model::DBI;
 
 use strict;
 use base 'Catalyst::Model';
-use MRO::Compat;
+use Class::C3;
 use DBI;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 __PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
 
@@ -50,9 +50,8 @@ Initializes DBI connection
 =cut
 
 sub new {
-	my $self = shift;
+	my $self  = shift->next::method(@_);
 	my ( $c ) = @_;
-	$self = $self->NEXT::new( @_ );
 	$self->{namespace}               ||= ref $self;
 	$self->{additional_base_classes} ||= ();
 	$self->{log} = $c->log;
