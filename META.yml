@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Catalyst-Model-DBI
-version:            0.25
+version:            0.26
 abstract:           ~
 author:
     - Alex Pavlovic (alex.pavlovic@taskforce-1.com)
@@ -11,8 +11,9 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    Catalyst:  5.00
-    DBI:       0
+    Catalyst:   5.00
+    Class::C3:  0
+    DBI:        0
 no_index:
     directory:
         - t
