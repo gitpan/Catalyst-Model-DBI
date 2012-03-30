@@ -1,50 +1,79 @@
-Catalyst::Model::DBI(3)User Contributed Perl DocumentatioCnatalyst::Model::DBI(3)
+NAME
+    Catalyst::Model::DBI - DBI Model Class
 
+SYNOPSIS
+      # use the helper to create a model for example
+      perl script/myapp_create.pl model MyModel DBI dsn username password
 
+      # lib/MyApp/Model/DBI.pm
+      package MyApp::Model::DBI;
 
-NNAAMMEE
-       Catalyst::Model::DBI - DBI Model Class
+      use base 'Catalyst::Model::DBI';
 
-SSYYNNOOPPSSIISS
-               # use the helper
-               create model DBI DBI dsn user password
+      __PACKAGE__->config(
+        dsn           => 'DBI:Pg:dbname=mydb;host=localhost',
+        username      => 'pgsql',
+        password      => '',
+        options       => { AutoCommit => 1 },
+      );
 
-               # lib/MyApp/Model/DBI.pm
-               package MyApp::Model::DBI;
+      1;
 
-               use base 'Catalyst::Model::DBI';
+      # or load settings from a config file via Config::General for example
+      # in your myapp.conf you could have
 
-               __PACKAGE__->config(
-                       dsn           => 'dbi:Pg:dbname=myapp',
-                       password      => '',
-                       user          => 'postgres',
-                       options       => { AutoCommit => 1 },
-               );
+      name MyApp
 
-               1;
+      <Model::MyModel>
+        dsn "DBI:Pg:dbname=mydb;host=localhost"
+        username pgsql
+        password ""
+        <options>
+          AutoCommit 1
+        </options>
+      </Model>
 
-               my $dbh = $c->model('DBI')->dbh;
-               #do something with $dbh ...
+      # note that config settings always override Model settings
 
-DDEESSCCRRIIPPTTIIOONN
-       This is the "DBI" model class.
+      # do something with $dbh inside a controller ...
+      my $dbh = $c->model('MyModel')->dbh;
 
-MMEETTHHOODDSS
-       new Initializes DBI connection
+      # do something with $dbh inside a model ...
+      my $dbh = $self->dbh;
 
-       $self->dbh
-           Returns the current database handle.
+DESCRIPTION
+    This is the "DBI" model class.
 
-SSEEEE AALLSSOO
-       Catalyst, DBI
+METHODS
+    new Initializes DBI connection
 
-AAUUTTHHOORR
-       Alex Pavlovic, "alex.pavlovic@taskforce-1.com"
+    $self->dbh
+        Returns the current database handle.
 
-CCOOPPYYRRIIGGHHTT
-       This program is free software, you can redistribute it and/or modify it
-       under the same terms as Perl itself.
+    $self->stay_connected
+        Returns a connected database handle.
 
+    $self->connected
+        Returns true if the database handle is active and pingable.
 
+    $self->connect
+        Connects to the database and returns the handle.
 
-perl v5.8.7                       2005-11-27           Catalyst::Model::DBI(3)
+    $self->disconnect
+        Executes rollback if AutoCommit is active, disconnects and unsets
+        the database handle.
+
+SEE ALSO
+    Catalyst, DBI
+
+AUTHOR
+    Alex Pavlovic, "alex.pavlovic@taskforce-1.com"
+
+COPYRIGHT
+    Copyright (c) 2005 - 2012 the Catalyst::Model::DBI "AUTHOR" as listed
+    above.
+
+LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

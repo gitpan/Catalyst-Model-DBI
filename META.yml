@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Catalyst-Model-DBI
-version:            0.28
+version:            0.29
 abstract:           ~
 author:
     - Alex Pavlovic (alex.pavlovic@taskforce-1.com)
@@ -18,7 +18,7 @@ no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.54
+generated_by:       ExtUtils::MakeMaker version 6.56
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4

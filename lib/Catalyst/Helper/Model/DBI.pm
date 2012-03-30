@@ -3,7 +3,7 @@ package Catalyst::Helper::Model::DBI;
 use strict;
 use File::Spec;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Catalyst::Helper::Model::DBI - Helper for DBI Models
 
 =head1 SYNOPSIS
 
-    script/create.pl model DBI DBI dsn user password
+  script/create.pl model DBI DBI dsn user password
 
 =head1 DESCRIPTION
 
@@ -34,13 +34,13 @@ Makes tests for the DBI Model.
 =cut
 
 sub mk_compclass {
-    my ( $self, $helper, $dsn, $user, $pass ) = @_;
-    $helper->{dsn}  = $dsn  || '';
-    $helper->{user} = $user || '';
-    $helper->{pass} = $pass || '';
-    my $file = $helper->{file};
-    $helper->render_file( 'dbiclass', $file );
-    return 1;
+  my ( $self, $helper, $dsn, $user, $pass ) = @_;
+  $helper->{dsn}  = $dsn  || '';
+  $helper->{user} = $user || '';
+  $helper->{pass} = $pass || '';
+  my $file = $helper->{file};
+  $helper->render_file( 'dbiclass', $file );
+  return 1;
 }
 
 =head1 SEE ALSO
@@ -70,10 +70,10 @@ use warnings;
 use parent 'Catalyst::Model::DBI';
 
 __PACKAGE__->config(
-    dsn           => '[% dsn %]',
-    user          => '[% user %]',
-    password      => '[% pass %]',
-    options       => {},
+  dsn           => '[% dsn %]',
+  user          => '[% user %]',
+  password      => '[% pass %]',
+  options       => {},
 );
 
 =head1 NAME
