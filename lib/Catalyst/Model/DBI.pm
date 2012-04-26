@@ -2,13 +2,14 @@ package Catalyst::Model::DBI;
 
 use strict;
 use base 'Catalyst::Model';
+
 use MRO::Compat;
 use mro 'c3';
-use DBI;
+use DBIx::Connector;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
-__PACKAGE__->mk_accessors( qw/_dbh _pid _tid/ );
+__PACKAGE__->mk_accessors( qw/_connection _dbh/ );
 
 =head1 NAME
 
@@ -55,9 +56,23 @@ Catalyst::Model::DBI - DBI Model Class
   # do something with $dbh inside a model ...
   my $dbh = $self->dbh;
 
+  #do something with DBIx::Connector connection inside a controller ...
+  my $connection = $c->model('MyModel')->connection;
+
+  #do something with DBIx::Connector connection inside a model ...
+  my $connection = $self->connection;
+
 =head1 DESCRIPTION
 
-This is the C<DBI> model class.
+This is the C<DBI> model class. It has been rewritten to use L<DBIx::Connector> since it's internal code
+that deals with connection maintenance has already been ported into there. You now have two options for 
+doing custom models with Catalyst. Either by using this model and any related modules as needed
+or by having your custom model decoupled from Catalyst and glued on using L<Catalyst::Model::Adaptor> 
+
+Some general rules are as follows. If you do not wish to use L<DBIx::Connector> directly or DBI and setup 
+connections in your custom models or have glue models, then use this model. If you however need models that 
+can be re-used outside of your application or simply wish to maintain connection code yourself outside of
+the Catalyst, then use L<Catalyst::Model::Adaptor> which allows you to glue outside models into your Catalyst app.
 
 =head1 METHODS
 
@@ -86,6 +101,16 @@ sub new {
   return $self;
 }
 
+=item $self->connection
+
+Returns the current DBIx::Connector connection handle.
+
+=cut
+
+sub connection {
+  return shift->connect( 0 ) ;
+}
+
 =item $self->dbh
 
 Returns the current database handle.
@@ -93,42 +118,7 @@ Returns the current database handle.
 =cut
 
 sub dbh {
-  return shift->stay_connected;
-}
-
-=item $self->stay_connected
-
-Returns a connected database handle.
-
-=cut
-
-sub stay_connected {
-  my $self = shift;
-  if ( $self->_dbh ) {
-    if ( defined $self->_tid && $self->_tid != threads->tid ) {
-      $self->_dbh( $self->connect );
-    } elsif ( $self->_pid != $$ ) {
-      $self->_dbh->{InactiveDestroy} = 1;
-      $self->_dbh( $self->connect );
-    } elsif ( ! $self->connected ) {
-      $self->_dbh( $self->connect );
-    }
-  } else {
-    $self->_dbh( $self->connect );
-  }
-  return $self->_dbh;
-}
-
-=item $self->connected
-
-Returns true if the database handle is active and pingable.
-
-=cut
-
-sub connected {
-  my $self = shift;
-  return unless $self->_dbh;
-  return $self->_dbh->{Active} && $self->_dbh->ping;
+  return shift->connect( 1 );
 }
 
 =item $self->connect
@@ -138,55 +128,42 @@ Connects to the database and returns the handle.
 =cut
 
 sub connect {
-  my $self = shift;
-  my $dbh;
+  my ( $self, $want_dbh ) = @_;
 
-  eval {
-    $dbh = DBI->connect(
-      $self->{dsn},
-      $self->{username} || $self->{user},
-      $self->{password} || $self->{pass},
-      $self->{options}
-    );
-  };
-  if ($@) {
-    $self->{log}->debug( qq/Couldn't connect to the database "$@"/ )
-      if $self->{debug};
-  } else {
-    $self->{log}->debug( 'Connected to the database via dsn:' . $self->{dsn} )
-      if $self->{debug};
+  my $connection = $self->_connection;
+  my $dbh = $self->_dbh;
+
+  unless ( $connection ) {
+    eval {
+      $connection = DBIx::Connector->new(
+        $self->{dsn},
+        $self->{username} || $self->{user},
+        $self->{password} || $self->{pass},
+        $self->{options}
+      );
+      $dbh = $connection->dbh;
+      $self->_dbh( $dbh );
+      $self->_connection( $connection );
+    };
+
+    if ($@) {
+      $self->{log}->debug( qq/Couldn't connect to the database via DBIx::Connector "$@"/ )
+        if $self->{debug};
+    } else {
+      $self->{log}->debug( 'Connected to the database using DBIx::Connector via dsn:' . $self->{dsn} )
+        if $self->{debug};
+    }
   }
-  $self->_pid( $$ );
-  $self->_tid( threads->tid ) if $INC{'threads.pm'};
-  return $dbh;
-}
 
-=item $self->disconnect
-
-Executes rollback if AutoCommit is active,
-disconnects and unsets the database handle.
-
-=cut
-
-sub disconnect {
-  my $self = shift;
-  if( $self->connected ) {
-    $self->_dbh->rollback unless $self->_dbh->{AutoCommit};
-    $self->_dbh->disconnect;
-    $self->_dbh( undef );
-  }
-}
-
-sub DESTROY {
-  my $self = shift;
-  $self->disconnect if (defined $self->_dbh);
+  my $handle = $want_dbh ? $dbh : $connection;
+  return $handle;
 }
 
 =back
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<DBI>
+L<Catalyst>, L<DBI>, L<Catalyst::Model::Proxy>, L<Catalyst::Model::DBI::SQL::Library>
 
 =head1 AUTHOR
 
