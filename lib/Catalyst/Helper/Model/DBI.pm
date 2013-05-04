@@ -3,7 +3,7 @@ package Catalyst::Helper::Model::DBI;
 use strict;
 use File::Spec;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =head1 NAME
 

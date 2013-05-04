@@ -22,4 +22,4 @@ requires:
   DBI: 0
   DBIx::Connector: 0
   MRO::Compat: 0
-version: 0.31
+version: 0.32

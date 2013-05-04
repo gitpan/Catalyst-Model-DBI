@@ -11,7 +11,7 @@ use constant LOG_LEVEL_BASIC => 1;
 use constant LOG_LEVEL_INTERMEDIATE => 2;
 use constant LOG_LEVEL_FULL => 3;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 __PACKAGE__->mk_accessors( qw/_connection _dbh/ );
 
@@ -140,6 +140,10 @@ sub connect {
   my $connection = $self->_connection;
   my $dbh = $self->_dbh;
 
+  my $log = $self->{log};
+  my $debug = $self->{debug};
+  my $loglevel = $self->{loglevel};
+  
   unless ( $connection ) {
     eval {
       $connection = DBIx::Connector->new(
@@ -154,11 +158,13 @@ sub connect {
     };
 
     if ($@) {
-      $self->{log}->debug( qq/Couldn't connect to the database via DBIx::Connector "$@"/ )
-        if $self->{debug};
+      $log->debug(
+        qq/Couldn't connect to the database via DBIx::Connector "$@"/
+      ) if $debug && $loglevel >= LOG_LEVEL_BASIC;
     } else {
-      $self->{log}->debug( 'Connected to the database using DBIx::Connector via dsn:' . $self->{dsn} )
-        if $self->{debug};
+      $log->debug(
+        'Connected to the database using DBIx::Connector via dsn:' . $self->{dsn}
+      ) if $debug && $loglevel >= LOG_LEVEL_BASIC;
     }
   }
 
