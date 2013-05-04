@@ -15,6 +15,7 @@ SYNOPSIS
         username      => 'pgsql',
         password      => '',
         options       => { AutoCommit => 1 },
+        loglevel      => 1
       );
 
       1;
@@ -31,6 +32,7 @@ SYNOPSIS
         <options>
           AutoCommit 1
         </options>
+        loglevel 1
       </Model>
 
       # note that config settings always override Model settings

@@ -1,4 +1,6 @@
 Revision history for Perl extension Catalyst::Model::DBI.
+0.31  Fri May 03 23:08:00 2013
+  - added support for loglevel
 0.30  Fri Apr 27 18:00:00 2012
   - rewrote internals to use DBIx::Connector and updated documentation
 0.29  Fri Mar 30 14:00:00 2012

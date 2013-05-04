@@ -7,7 +7,11 @@ use MRO::Compat;
 use mro 'c3';
 use DBIx::Connector;
 
-our $VERSION = '0.30';
+use constant LOG_LEVEL_BASIC => 1;
+use constant LOG_LEVEL_INTERMEDIATE => 2;
+use constant LOG_LEVEL_FULL => 3;
+
+our $VERSION = '0.31';
 
 __PACKAGE__->mk_accessors( qw/_connection _dbh/ );
 
@@ -30,6 +34,7 @@ Catalyst::Model::DBI - DBI Model Class
     username      => 'pgsql',
     password      => '',
     options       => { AutoCommit => 1 },
+    loglevel      => 1
   );
 
   1;
@@ -46,6 +51,7 @@ Catalyst::Model::DBI - DBI Model Class
     <options>
       AutoCommit 1
     </options>
+    loglevel 1
   </Model>
 
   # note that config settings always override Model settings
@@ -97,7 +103,8 @@ sub new {
   $self->{additional_base_classes} ||= ();
   $self->{log} = $c->log;
   $self->{debug} = $c->debug;
-
+  $self->{loglevel} ||= LOG_LEVEL_BASIC;
+  
   return $self;
 }
 
